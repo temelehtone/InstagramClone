@@ -75,7 +75,7 @@ function App() {
           />
           <Route path="/profile/:username" element={<Profile />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/create-post" element={<CreatePost />} />
+          <Route path="/create-post" element={<CreatePost setAlert={setAlert} user={user}/>} />
         </Routes>
       </BrowserRouter>
     </div>
