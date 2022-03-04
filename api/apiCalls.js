@@ -32,24 +32,80 @@ functions.getProfile = (user) => {
 };
 
 functions.createPost = (user, caption, image) => {
-  return sanityClient.assets.upload("image", createReadStream(image.path), {
-    filename: basename(image.path),
-  }).then(data => functions.getUserId(user).then(ids => {
-    const id = ids[0]._id
-    return sanityClient.create({
-      _type: "post",
-      author: {_ref: id},
-      photo: {asset: {_ref: data._id }},
-      description: caption,
-      created_at: new Date()
+  return sanityClient.assets
+    .upload("image", createReadStream(image.path), {
+      filename: basename(image.path),
     })
-  }));
+    .then((data) =>
+      functions.getUserId(user).then((ids) => {
+        console.log(data._id);
+        const id = ids[0]._id;
+        return sanityClient.create({
+          _type: "post",
+          author: { _ref: id },
+          photo: { asset: { _ref: data._id } },
+          description: caption,
+          created_at: new Date(),
+        });
+      })
+    );
 };
 
 functions.getUserId = (user) => {
-  return sanityClient.fetch(`*[_type == "user" && username == $username]{
+  return sanityClient.fetch(
+    `*[_type == "user" && username == $username]{
     _id
-  }`, {username: user})
-}
+  }`,
+    { username: user }
+  );
+};
+
+functions.getAllPosts = () => {
+  return sanityClient.fetch(`*[_type == "post"]{
+    ...,
+    "username": author->username,
+    photo{
+      asset->{
+        _id,
+        url
+      }
+    }
+  }`);
+};
+
+functions.getPostsOfFollowing = (username) => {
+  return sanityClient.fetch(
+    `*[_type == "user" && username == $username]{
+    following[]->{
+      "posts": *[_type == "post" && references(^._id)]{
+        ...,
+        "username": author->username,
+        photo{
+          asset->{
+            _id,
+            url
+          }
+        }
+      }
+    }
+  }`,
+    { username }
+  );
+};
+
+functions.searchForUsername = (text) => {
+  return sanityClient.fetch(
+    `*[_type == "user" && username match "${text}*"]{
+      ...,
+      "followers": count(*[_type == "user" && references(^._id)]),
+      photo{
+          asset->{
+          _id,
+          url
+        }
+      }
+    }`
+  );
+};
 
 export default functions;
