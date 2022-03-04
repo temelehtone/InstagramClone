@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
-export default function SignUp() {
+export default function SignUp({ setAlert, setUser }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
+  const navigate = useNavigate();
 
   function createAccount(e) {
     const requestOptions = {
@@ -22,7 +24,15 @@ export default function SignUp() {
       .then((res) => {
         return res.json();
       })
-      .then((data) => console.log(data))
+      .then((data) => {
+        setAlert({
+          variant: "success",
+          message: "Your account has been created.",
+        });
+        setUser(data.username)
+        navigate("/");
+      })
+
       .catch((err) => console.log(err));
   }
 
@@ -37,7 +47,7 @@ export default function SignUp() {
   }
 
   return (
-    <Form className="">
+    <Form className="center-form">
       <Form.Group className="mb-4">
         <Form.Label>Username</Form.Label>
         <Form.Control

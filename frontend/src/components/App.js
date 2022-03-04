@@ -11,10 +11,12 @@ import Search from "./Search";
 import SignUp from "./SignUp";
 import "../css/App.css";
 
-
 function App() {
+  const [alert, setAlert] = useState(null);
+  const [user, setUser] = useState("");
+
   return (
-    <div className="">
+    <div className="fill-parent">
       <BrowserRouter>
         <Navbar collapseOnSelect expand="md" bg="dark" variant="dark">
           <Container fluid>
@@ -35,17 +37,42 @@ function App() {
                 </LinkContainer>
               </Nav>
               <Nav>
-                <Navbar.Text>
-                  <Link to="/login">Not Signed In</Link>
-                </Navbar.Text>
+                {user ? (
+                  <Navbar.Text>
+                    Signed in as: <Link to={"/profile/" + user}>{user}</Link> | {" "}
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
+                        setUser("");
+                        setAlert({
+                          variant: "warning",
+                          message: "You are signed out!",
+                        });
+                      }}
+                    >
+                      LogOut
+                    </Button>
+                  </Navbar.Text>
+                ) : (
+                  <Navbar.Text>
+                    <Link to="/login">Not Signed In</Link>
+                  </Navbar.Text>
+                )}
               </Nav>
             </Navbar.Collapse>
           </Container>
         </Navbar>
+        {alert ? (
+          <AlertDismissible {...alert} deleteAlert={() => setAlert(null)} />
+        ) : null}
         <Routes>
           <Route exact path="/" element={<AllPosts />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/login" element={<Login setAlert={setAlert} setUser={setUser}/>} />
+          <Route
+            path="/sign-up"
+            element={<SignUp setAlert={setAlert} setUser={setUser} />}
+          />
           <Route path="/profile/:username" element={<Profile />} />
           <Route path="/search" element={<Search />} />
           <Route path="/create-post" element={<CreatePost />} />
