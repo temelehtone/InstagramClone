@@ -23,6 +23,7 @@ export default function Profile({ setAlert, user }) {
         return;
       }
     }
+    setFollowing(false)
   }
 
   function updateProfile(username) {
@@ -44,11 +45,33 @@ export default function Profile({ setAlert, user }) {
       })
       .catch((err) => console.error(err));
   }
-  function followClick() {}
+  function followClick() {
+    if (owner) return;
+
+    if (!following) {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user: user, id: profileData._id }),
+      };
+      fetch("/addFollower", requestOptions)
+        .then((res) => res.json())
+        .then((_data) => updateProfile(params.username)).catch(err => console.error(err));
+    } else {
+      const requestOptions = {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user: user, id: profileData._id }),
+      };
+      fetch("/removeFollower", requestOptions)
+        .then((res) => res.json())
+        .then((_data) => updateProfile(params.username)).catch(err => console.error(err));
+    }
+  }
 
   function hideEditCallback() {
-      updateProfile(params.username)
-      setEditing(false)
+    updateProfile(params.username);
+    setEditing(false);
   }
 
   return (

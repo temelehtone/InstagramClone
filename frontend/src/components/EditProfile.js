@@ -60,6 +60,7 @@ export default function EditProfile({
               />
             ) : (
               <img
+              alt=""
                 src={file ? URL.createObjectURL(file) : null}
                 className="upload-image"
               />

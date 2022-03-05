@@ -11,7 +11,9 @@ const {
   getAllPosts,
   searchForUsername,
   getPosts,
-  updateProfile
+  updateProfile,
+  addFollower,
+  removeFollower,
 } = functions;
 
 const app = express();
@@ -49,7 +51,7 @@ app.get("/getPostsOfFollowing", (req, res) => {
   const user = req.query.user;
   getPostsOfFollowing(user)
     .then((data) => {
-      var posts = data[0].getPostsOfFollowing;
+      var posts = data[0].following;
       posts = posts.map((post) => post.posts);
       posts = posts.flat(1);
       res.json(posts);
@@ -80,6 +82,16 @@ app.post("/updateProfile", upload.single("file"), (req, res) => {
     body.bio,
     req.file
   ).then((data) => res.json(data));
+});
+
+app.post("/addFollower", (req, res) => {
+  const body = req.body;
+  addFollower(body.user, body.id).then((data) => res.json(data));
+});
+
+app.delete("/removeFollower", (req, res) => {
+  const body = req.body;
+  removeFollower(body.user, body.id).then((data) => res.json(data));
 });
 
 app.listen(3001, () => console.log("Started..."));
