@@ -39,7 +39,6 @@ functions.createPost = (user, caption, image) => {
     })
     .then((data) =>
       functions.getUserId(user).then((ids) => {
-        console.log(data._id);
         const id = ids[0]._id;
         return sanityClient.create({
           _type: "post",
