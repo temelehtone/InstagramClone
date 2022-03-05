@@ -14,6 +14,7 @@ const {
   updateProfile,
   addFollower,
   removeFollower,
+  getFollowers,
 } = functions;
 
 const app = express();
@@ -56,18 +57,27 @@ app.get("/getPostsOfFollowing", (req, res) => {
 
       posts = posts.flat(1);
       posts.sort(function (post, post2) {
-        return new Date(post2.created_at).getTime() - new Date(post.created_at).getTime();
-      });  
+        return (
+          new Date(post2.created_at).getTime() -
+          new Date(post.created_at).getTime()
+        );
+      });
       res.json(posts);
     })
-    .catch((err) => {console.error(err); res.json([])});
+    .catch((err) => {
+      console.error(err);
+      res.json([]);
+    });
 });
 
 app.get("/getAllPosts", (req, res) => {
   getAllPosts().then((data) => {
     data.sort(function (post, post2) {
-      return new Date(post2.created_at).getTime() - new Date(post.created_at).getTime();
-    }); 
+      return (
+        new Date(post2.created_at).getTime() -
+        new Date(post.created_at).getTime()
+      );
+    });
     res.json(data);
   });
 });

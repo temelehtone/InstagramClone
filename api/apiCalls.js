@@ -19,8 +19,26 @@ functions.getProfile = (user) => {
   return sanityClient.fetch(
     `*[_type == "user" && username == $username]{
       ...,
-      "following": count(following),
-      "followers": *[_type == "user" && references(^._id)],
+      following[]->{
+        ...,
+        "followers": *[_type == "user" && references(^._id)],
+        photo{
+          asset->{
+            _id,
+            url
+          }
+        }
+      },
+      "followers": *[_type == "user" && references(^._id)]{
+        ...,
+        "followers": *[_type == "user" && references(^._id)],
+        photo{
+          asset->{
+            _id,
+            url
+          }
+        }
+      },
       photo{
         asset->{
           _id,
@@ -97,7 +115,7 @@ functions.searchForUsername = (text) => {
   return sanityClient.fetch(
     `*[_type == "user" && username match "${text}*"]{
       ...,
-      "followers": count(*[_type == "user" && references(^._id)]),
+      "followers": *[_type == "user" && references(^._id)],
       photo{
           asset->{
           _id,

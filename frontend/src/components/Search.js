@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button, ListGroup, Card } from "react-bootstrap";
+import { Form, Button, ListGroup, Card, ListGroupItem } from "react-bootstrap";
 import ProfileItem from "./ProfileItem";
 import "../css/Search.css";
 
@@ -7,10 +7,12 @@ export default function Search() {
   const [searchText, updateSearchText] = useState("");
   const [searchResults, updateSearchResults] = useState([]);
 
-    function search() {
-        fetch("/searchForUsername?text=" + searchText).then(res => res.json()).then(data => updateSearchResults(data)).catch(err => console.error(err))
-    }
-
+  function search() {
+    fetch("/searchForUsername?text=" + searchText)
+      .then((res) => res.json())
+      .then((data) => updateSearchResults(data))
+      .catch((err) => console.error(err));
+  }
 
   return (
     <div className="search">
@@ -32,9 +34,11 @@ export default function Search() {
         {searchResults.length > 0 ? (
           <div className="search-results-wrapper">
             <Card style={{ width: "100%" }}>
-              <ListGroup variant="flush">
+              <ListGroup >
                 {searchResults.map((item, idx) => (
-                  <ProfileItem {...item} key={idx} />
+                  <ListGroupItem>
+                    <ProfileItem {...item} key={idx} />
+                  </ListGroupItem>
                 ))}
               </ListGroup>
             </Card>

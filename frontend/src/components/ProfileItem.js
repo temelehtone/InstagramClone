@@ -10,7 +10,6 @@ export default function ProfileItem({
   followers,
 }) {
   const navigate = useNavigate();
-
   return (
     <ListGroup.Item>
       <div className="d-flex align-items-center justify-content-between">
@@ -32,7 +31,7 @@ export default function ProfileItem({
           </div>
           <div className="d-flex flex-column align-items-center">
             <p className="px-2">
-              <strong>{followers} Followers</strong>
+              <strong>{followers ? followers.length : 0} Followers</strong>
             </p>
             <Button
               variant="success"

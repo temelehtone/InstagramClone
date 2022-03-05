@@ -28,5 +28,6 @@
     margin-top: 2em;
     flex-direction: column;
     width: 100%;
+    gap: 20px;
 
 }
