@@ -108,4 +108,51 @@ functions.searchForUsername = (text) => {
   );
 };
 
+functions.getPosts = (user) => {
+  return sanityClient.fetch(
+    `*[_type == "post" && author->username == $username]{
+    ...,
+    "username": author->username,
+    photo{
+      asset->{
+        _id, 
+        url
+      }
+    }
+  }`,
+    { username: user }
+  );
+};
+
+functions.updateProfile = (user, first_name, last_name, bio, image) => {
+  if (image) {
+    return sanityClient.assets
+      .upload("image", createReadStream(image.path), {
+        filename: basename(image.path),
+      })
+      .then((data) => functions.getUserId(user).then((ids) =>
+      sanityClient
+        .patch(ids[0]._id)
+        .set({
+          first_name,
+          last_name,
+          bio,
+          photo: { asset: { _ref: data._id } },
+        }).commit()
+    ))
+      
+  } else {
+    return functions.getUserId(user)
+    .then((ids) =>
+      sanityClient
+        .patch(ids[0]._id)
+        .set({
+          first_name,
+          last_name,
+          bio,
+        }).commit()
+    );
+  }
+};
+
 export default functions;

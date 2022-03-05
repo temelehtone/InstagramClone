@@ -73,7 +73,7 @@ function App() {
             path="/sign-up"
             element={<SignUp setAlert={setAlert} setUser={setUser} />}
           />
-          <Route path="/profile/:username" element={<Profile />} />
+          <Route path="/profile/:username" element={<Profile user={user} setAlert={setAlert}/>} />
           <Route path="/search" element={<Search />} />
           <Route path="/create-post" element={<CreatePost setAlert={setAlert} user={user}/>} />
         </Routes>

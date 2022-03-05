@@ -3,8 +3,16 @@ import bodyParser from "body-parser";
 import functions from "./apiCalls.js";
 import multer from "multer";
 
-
-const { createUser, getProfile, createPost, getPostsOfFollowing, getAllPosts, searchForUsername } = functions;
+const {
+  createUser,
+  getProfile,
+  createPost,
+  getPostsOfFollowing,
+  getAllPosts,
+  searchForUsername,
+  getPosts,
+  updateProfile
+} = functions;
 
 const app = express();
 app.use(bodyParser.json());
@@ -39,22 +47,39 @@ app.post("/createPost", upload.single("file"), (req, res) => {
 
 app.get("/getPostsOfFollowing", (req, res) => {
   const user = req.query.user;
-  getPostsOfFollowing(user).then(data => {
-    var posts = data[0].getPostsOfFollowing
-    posts = posts.map(post => post.posts)
-    posts = posts.flat(1)
-    res.json(posts)
-  }).catch(err => res.json([]))
-})
+  getPostsOfFollowing(user)
+    .then((data) => {
+      var posts = data[0].getPostsOfFollowing;
+      posts = posts.map((post) => post.posts);
+      posts = posts.flat(1);
+      res.json(posts);
+    })
+    .catch((err) => res.json([]));
+});
 
 app.get("/getAllPosts", (req, res) => {
-  getAllPosts().then(data => res.json(data))
-})
-
+  getAllPosts().then((data) => res.json(data));
+});
 
 app.get("/searchForUsername", (req, res) => {
   const text = req.query.text;
   searchForUsername(text).then((data) => res.json(data));
+});
+
+app.get("/getPosts", (req, res) => {
+  const user = req.query.user;
+  getPosts(user).then((data) => res.json(data));
+});
+
+app.post("/updateProfile", upload.single("file"), (req, res) => {
+  const body = req.body;
+  updateProfile(
+    body.user,
+    body.first_name,
+    body.last_name,
+    body.bio,
+    req.file
+  ).then((data) => res.json(data));
 });
 
 app.listen(3001, () => console.log("Started..."));
