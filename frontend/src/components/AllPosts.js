@@ -41,7 +41,7 @@ export default function AllPosts({ user }) {
               </Link>
               <Card.Text>{post.description}</Card.Text>
             </Card.Body>
-            <Card.Footer className="text-muted">{post.created_at}</Card.Footer>
+            <Card.Footer className="text-muted">{new Date(post.created_at).toLocaleString()}</Card.Footer>
           </Card>
         </div>
       )) : null}

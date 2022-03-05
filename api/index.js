@@ -53,14 +53,23 @@ app.get("/getPostsOfFollowing", (req, res) => {
     .then((data) => {
       var posts = data[0].following;
       posts = posts.map((post) => post.posts);
+
       posts = posts.flat(1);
+      posts.sort(function (post, post2) {
+        return new Date(post2.created_at).getTime() - new Date(post.created_at).getTime();
+      });  
       res.json(posts);
     })
-    .catch((err) => res.json([]));
+    .catch((err) => {console.error(err); res.json([])});
 });
 
 app.get("/getAllPosts", (req, res) => {
-  getAllPosts().then((data) => res.json(data));
+  getAllPosts().then((data) => {
+    data.sort(function (post, post2) {
+      return new Date(post2.created_at).getTime() - new Date(post.created_at).getTime();
+    }); 
+    res.json(data);
+  });
 });
 
 app.get("/searchForUsername", (req, res) => {
