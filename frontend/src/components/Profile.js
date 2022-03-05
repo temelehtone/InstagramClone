@@ -5,7 +5,7 @@ import { Button } from "react-bootstrap";
 import EditProfile from "./EditProfile";
 import "../css/Profile.css";
 import FollowersList from "./FollowersList";
-import FollowingList from "./FollowingList"
+import FollowingList from "./FollowingList";
 
 export default function Profile({ setAlert, user }) {
   const [profileData, setProfileData] = useState({});
@@ -13,8 +13,8 @@ export default function Profile({ setAlert, user }) {
   const [following, setFollowing] = useState(false);
   const [owner, setOwner] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [showFollowers, setShowFollowers] = useState(false)
-  const [showFollowing, setShowFollowing] = useState(false)
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
   const params = useParams();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function Profile({ setAlert, user }) {
         return;
       }
     }
-    setFollowing(false)
+    setFollowing(false);
   }
 
   function updateProfile(username) {
@@ -61,7 +61,8 @@ export default function Profile({ setAlert, user }) {
       };
       fetch("/addFollower", requestOptions)
         .then((res) => res.json())
-        .then((_data) => updateProfile(params.username)).catch(err => console.error(err));
+        .then((_data) => updateProfile(params.username))
+        .catch((err) => console.error(err));
     } else {
       const requestOptions = {
         method: "DELETE",
@@ -70,7 +71,8 @@ export default function Profile({ setAlert, user }) {
       };
       fetch("/removeFollower", requestOptions)
         .then((res) => res.json())
-        .then((_data) => updateProfile(params.username)).catch(err => console.error(err));
+        .then((_data) => updateProfile(params.username))
+        .catch((err) => console.error(err));
     }
   }
 
@@ -79,8 +81,8 @@ export default function Profile({ setAlert, user }) {
     setEditing(false);
   }
   function listHideCallback() {
-    setShowFollowing(false)
-    setShowFollowers(false)
+    setShowFollowing(false);
+    setShowFollowers(false);
   }
 
   return (
@@ -92,8 +94,16 @@ export default function Profile({ setAlert, user }) {
         profileData={profileData}
         setAlert={setAlert}
       />
-      <FollowersList profileData={profileData} show={showFollowers} listHideCallback={listHideCallback}/>
-      <FollowingList profileData={profileData} show={showFollowing} listHideCallback={listHideCallback}/>
+      <FollowersList
+        profileData={profileData}
+        show={showFollowers}
+        listHideCallback={listHideCallback}
+      />
+      <FollowingList
+        profileData={profileData}
+        show={showFollowing}
+        listHideCallback={listHideCallback}
+      />
       <div className="profile-banner">
         <h4>@{profileData.username}</h4>
         <div className="profile-data">
@@ -113,17 +123,45 @@ export default function Profile({ setAlert, user }) {
             <h4>{posts ? posts.length : 0}</h4>
           </div>
           <div className="vertical-data">
-            
-            {user && owner ? <Button variant="success" onClick={() => setShowFollowers(true)}>Followers</Button> : <p><strong>Followers</strong></p>}
-            
-            
+            {user && owner ? (
+              <Button variant="success" onClick={() => setShowFollowers(true)}>
+                Followers
+              </Button>
+            ) : (
+              <p>
+                <strong>Followers</strong>
+              </p>
+            )}
+
             <h4>{profileData.followers ? profileData.followers.length : 0}</h4>
           </div>
           <div className="vertical-data">
-          {user && owner ? <Button variant="success" onClick={() => setShowFollowing(true)}>Following</Button> : <p><strong>Following</strong></p>}
+            {user && owner ? (
+              <Button variant="success" onClick={() => setShowFollowing(true)}>
+                Following
+              </Button>
+            ) : (
+              <p>
+                <strong>Following</strong>
+              </p>
+            )}
             <h4>{profileData.following ? profileData.following.length : 0}</h4>
           </div>
-          <div className="follow-button">
+          
+        </div>
+        <div className="profile-second-row">
+          <div className="profile-bio">
+            <div className="profile-name">
+              <strong>
+                {(profileData.first_name ? profileData.first_name : "") +
+                  " " +
+                  (profileData.last_name ? profileData.last_name : "")}
+              </strong>
+            </div>
+            <div className="profile-text">{profileData.bio}</div>
+          </div>
+        <div>
+        <div className="follow-button">
             {user && !owner ? (
               <Button
                 variant={following ? "danger" : "success"}
@@ -132,22 +170,13 @@ export default function Profile({ setAlert, user }) {
                 {following ? "Unfollow" : "Follow"}
               </Button>
             ) : null}
-            {user && owner ? (
-              <Button variant="primary" onClick={() => setEditing(true)}>
-                Edit
-              </Button>
-            ) : null}
           </div>
+          {user && owner ? (
+            <Button variant="primary" onClick={() => setEditing(true)}>
+              Edit
+            </Button>
+          ) : null}
         </div>
-        <div className="profile-bio">
-          <div className="profile-name">
-            <strong>
-              {(profileData.first_name ? profileData.first_name : "") +
-                " " +
-                (profileData.last_name ? profileData.last_name : "")}
-            </strong>
-          </div>
-          <div className="profile-text">{profileData.bio}</div>
         </div>
       </div>
       <div className="break"></div>

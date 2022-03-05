@@ -53,6 +53,11 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 5px;
 }
+.profile-second-row{
+    display: flex;
+    justify-content: space-between;
+    min-width: 400px;
+}
 
 .profile-posts img {
     width: 100%;

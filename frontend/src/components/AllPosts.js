@@ -40,7 +40,7 @@ export default function AllPosts({ user }) {
                   <Link to={"/profile/" + post.username}>
                     <Card.Title>@{post.username}</Card.Title>
                   </Link>
-                  <Card.Text>{post.description}</Card.Text>
+                  <Card.Text style={{ color: "black" }}>{post.description}</Card.Text>
                 </Card.Body>
                 <Card.Footer className="text-muted">
                   {new Date(post.created_at).toLocaleString()}

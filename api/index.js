@@ -89,7 +89,14 @@ app.get("/searchForUsername", (req, res) => {
 
 app.get("/getPosts", (req, res) => {
   const user = req.query.user;
-  getPosts(user).then((data) => res.json(data));
+  getPosts(user).then((data) => {
+    data.sort(function (post, post2) {
+      return (
+        new Date(post2.created_at).getTime() -
+        new Date(post.created_at).getTime()
+      );
+    });
+    res.json(data)});
 });
 
 app.post("/updateProfile", upload.single("file"), (req, res) => {
