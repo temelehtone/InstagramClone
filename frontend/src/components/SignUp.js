@@ -8,32 +8,44 @@ export default function SignUp({ setAlert, setUser }) {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
-  function createAccount(e) {
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstName: firstName,
-        lastName: lastName,
-        username: username,
-      }),
-    };
-    fetch("/createUser", requestOptions)
-      .then((res) => {
-        return res.json();
-      })
+  function createAccount() {
+    fetch("/getProfile?user=" + username)
+      .then((res) => res.json())
       .then((data) => {
-        setAlert({
-          variant: "success",
-          message: "Your account has been created.",
-        });
-        setUser(data.username)
-        navigate("/");
-      })
+        if (data.length > 0) {
+          setAlert({
+            variant: "danger",
+            message: "Username is already in use.",
+          });
+          return;
+        } else {
+          const requestOptions = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              firstName: firstName,
+              lastName: lastName,
+              username: username,
+            }),
+          };
+          fetch("/createUser", requestOptions)
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              setAlert({
+                variant: "success",
+                message: "Your account has been created.",
+              });
+              setUser(data.username);
+              navigate("/");
+            })
 
-      .catch((err) => console.log(err));
+            .catch((err) => console.log(err));
+        }
+      });
   }
 
   function updateUsername(e) {
