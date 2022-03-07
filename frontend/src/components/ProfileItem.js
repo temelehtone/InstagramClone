@@ -8,6 +8,7 @@ export default function ProfileItem({
   last_name,
   photo,
   followers,
+  listHideCallback,
 }) {
   const navigate = useNavigate();
   return (
@@ -15,7 +16,7 @@ export default function ProfileItem({
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center">
           <img
-          alt=""
+            alt=""
             src={photo ? photo.asset.url : "https://via.placeholder.com/80"}
             style={{ width: "80px" }}
           />
@@ -36,8 +37,13 @@ export default function ProfileItem({
             <Button
               variant="success"
               className="px-2 m-0"
-              onClick={() => navigate("/profile/" + username)}
-            >View</Button>
+              onClick={() => {
+                listHideCallback();
+                navigate("/profile/" + username);
+              }}
+            >
+              View
+            </Button>
           </div>
         </div>
       </div>

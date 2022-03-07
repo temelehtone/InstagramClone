@@ -16,7 +16,7 @@ export default function FollowersList({ show, profileData, listHideCallback }) {
               <ListGroup>
                 {profileData.followers.map((item, idx) => (
                   <ListGroupItem>
-                    <ProfileItem {...item} key={idx} />
+                    <ProfileItem {...item} key={idx} listHideCallback={listHideCallback}/>
                   </ListGroupItem>
                 ))}
               </ListGroup>

@@ -37,7 +37,7 @@ export default function Search() {
               <ListGroup >
                 {searchResults.map((item, idx) => (
                   <ListGroupItem>
-                    <ProfileItem {...item} key={idx} />
+                    <ProfileItem {...item} key={idx} listHideCallback={() => {}} />
                   </ListGroupItem>
                 ))}
               </ListGroup>

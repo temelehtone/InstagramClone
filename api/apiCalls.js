@@ -78,9 +78,13 @@ functions.getUserId = (user) => {
   );
 };
 
+
 functions.getAllPosts = () => {
   return sanityClient.fetch(`*[_type == "post"]{
     ...,
+    likes[]->{
+      ...
+    },
     "username": author->username,
     photo{
       asset->{
@@ -97,6 +101,9 @@ functions.getPostsOfFollowing = (username) => {
     following[]->{
       "posts": *[_type == "post" && references(^._id)]{
         ...,
+        likes[]->{
+          ...
+        },
         "username": author->username,
         photo{
           asset->{
@@ -195,5 +202,24 @@ functions.removeFollower = (user, followingId) => {
       .commit()
   );
 };
+
+functions.addLike = (postId, userId) => {
+  
+  return sanityClient
+      .patch(postId)
+      .setIfMissing({ likes: [] })
+      .insert("after", "likes[-1]", [
+        { _ref: userId, _key: nanoid(), _type: "reference" },
+      ],)
+      .commit();
+};
+
+
+functions.removeLike = (postId, userId) => {
+  return sanityClient
+      .patch(postId)
+      .unset([`likes[_ref=="${userId}"]`])
+      .commit()
+}
 
 export default functions;

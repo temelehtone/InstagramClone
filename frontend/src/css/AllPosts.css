@@ -1,0 +1,11 @@
+.likes-and-comments {
+    display: flex;
+    align-items: center;
+}
+
+.liked-heart {
+    color: red
+}
+.unliked-heart {
+    color: rgb(112, 112, 112)
+}

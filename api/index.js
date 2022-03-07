@@ -14,7 +14,9 @@ const {
   updateProfile,
   addFollower,
   removeFollower,
-  getFollowers,
+  addLike,
+  removeLike,
+  getUserId,
 } = functions;
 
 const app = express();
@@ -43,6 +45,11 @@ app.get("/getProfile", (req, res) => {
   getProfile(user).then((data) => res.json(data));
 });
 
+app.get("/getUserId", (req, res) => {
+  const user = req.query.user;
+  getUserId(user).then((data) => res.json(data));
+});
+
 app.post("/createPost", upload.single("file"), (req, res) => {
   const body = req.body;
   createPost(body.user, body.caption, req.file).then((data) => res.json(data));
@@ -56,13 +63,21 @@ app.get("/getPostsOfFollowing", (req, res) => {
       posts = posts.map((post) => post.posts);
 
       posts = posts.flat(1);
-      posts.sort(function (post, post2) {
+      var newPosts = [];
+      posts.forEach((post) => {
+        if (!newPosts.includes(post)) newPosts.push(post);
+      });
+      console.log(posts)
+      newPosts.sort(function (post, post2) {
         return (
           new Date(post2.created_at).getTime() -
           new Date(post.created_at).getTime()
         );
       });
-      res.json(posts);
+      newPosts.forEach((post) => {
+        post.likes ? null : (post.likes = []);
+      });
+      res.json(newPosts);
     })
     .catch((err) => {
       console.error(err);
@@ -96,7 +111,8 @@ app.get("/getPosts", (req, res) => {
         new Date(post.created_at).getTime()
       );
     });
-    res.json(data)});
+    res.json(data);
+  });
 });
 
 app.post("/updateProfile", upload.single("file"), (req, res) => {
@@ -118,6 +134,17 @@ app.post("/addFollower", (req, res) => {
 app.delete("/removeFollower", (req, res) => {
   const body = req.body;
   removeFollower(body.user, body.id).then((data) => res.json(data));
+});
+
+app.post("/addLike", (req, res) => {
+  const body = req.body;
+  addLike(body.post._id, body.user);
+  res.json([]);
+});
+
+app.delete("/removeLike", (req, res) => {
+  const body = req.body;
+  removeLike(body.post._id, body.user).then((data) => res.json(data));
 });
 
 app.listen(3001, () => console.log("Started..."));

@@ -24,5 +24,19 @@ export default {
       type: "reference",
       to: [{ type: "user" }],
     },
+    {
+      title: "Likes",
+      name: "likes",
+      type: "array",
+      of: [{ type: "reference", to: { type: "user" } }],
+      validation: (Rule) => Rule.unique(),
+    },
+    {
+      title: "Comments",
+      name: "comments",
+      type: "array",
+      of: [{ type: "reference", to: { type: "user" } }],
+      validation: (Rule) => Rule.unique(),
+    },
   ],
 };
