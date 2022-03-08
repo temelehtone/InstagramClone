@@ -17,7 +17,8 @@ const {
   addLike,
   removeLike,
   getUserId,
-  addComment
+  addComment,
+  removeComment
 } = functions;
 
 const app = express();
@@ -58,7 +59,7 @@ app.post("/createPost", upload.single("file"), (req, res) => {
 
 app.get("/getPostsOfFollowing", (req, res) => {
   const user = req.query.user;
-  getPostsOfFollowing(user)
+  getPostsOfFollowing(user, userId)
     .then((data) => {
       var posts = data[0].following;
       posts = posts.map((post) => post.posts);
@@ -152,5 +153,11 @@ app.post("/addComment", (req, res) => {
   addComment(body.user, body.comment, body.post._id)
   res.json([])
 })
+
+app.delete("/removeComment", (req, res) => {
+  const body = req.body;
+  removeComment(body.comment, body.post._id).then((data) => res.json(data));
+});
+
 
 app.listen(3001, () => console.log("Started..."));

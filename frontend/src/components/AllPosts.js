@@ -1,27 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, Form } from "react-bootstrap";
-import { BsFillHeartFill, BsHeart } from "react-icons/bs";
+import { BsFillHeartFill, BsHeart, BsTrash } from "react-icons/bs";
 import IconButton from "@mui/material/IconButton";
 import "../css/AllPosts.css";
 
 export default function AllPosts({ user }) {
   const [allPostsData, setAllPosts] = useState(null);
-  const [userId, setUserId] = useState(null);
   const [comment, setComment] = useState("");
   var canLike = true;
 
   useEffect(() => {
     initializePage();
-    if (user) getUserId(user);
-  }, [user, allPostsData]);
+  }, [user]);
 
   function initializePage() {
     if (!user) {
       fetch("/getAllPosts")
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setAllPosts(data);
         })
         .catch((err) => console.error(err));
@@ -29,36 +26,23 @@ export default function AllPosts({ user }) {
       fetch("getPostsOfFollowing?user=" + user)
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setAllPosts(data);
         })
         .catch((err) => console.error(err));
     }
   }
 
-  function getUserId(username) {
-    fetch("/getUserId?user=" + username)
-      .then((res) => res.json())
-      .then((data) => {
-        setUserId(data[0]._id);
-      });
-  }
-
   function likeButtonPressed(post) {
     if (!user || !canLike) return;
     canLike = false;
-    if (
-      post.likes.filter((likerProfile) => likerProfile.username === user)
-        .length === 0
-    ) {
+    if (post.likes.filter((like) => like.like === user).length === 0) {
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user: userId, post: post }),
+        body: JSON.stringify({ user: user, post: post }),
       };
       fetch("/addLike", requestOptions)
         .then((_data) => {
-          setTimeout(() => {}, 500);
           canLike = true;
           initializePage();
         })
@@ -67,33 +51,49 @@ export default function AllPosts({ user }) {
       const requestOptions = {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user: userId, post: post }),
+        body: JSON.stringify({ user: user, post: post }),
       };
       fetch("/removeLike", requestOptions)
         .then((_data) => {
-          setTimeout(initializePage(), 500);
           canLike = true;
-          
+          initializePage();
         })
         .catch((err) => console.error(err));
     }
   }
 
   function addComment(post) {
+    if (comment.trim() === "") {
+      initializePage();
+      return;
+    }
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user: user, comment: comment, post: post }),
+      body: JSON.stringify({ user: user, comment: comment.trim(), post: post }),
     };
 
     fetch("/addComment", requestOptions)
-      .then((_data) => {setTimeout(initializePage(), 500); setComment("")
-      document.querySelector(".comment-input").value = ""
-    })
+      .then((_data) => {
+        initializePage();
+        setComment("");
+        document.querySelector(".comment-input").value = "";
+      })
       .catch((err) => console.error(err));
   }
+  function removeComment(post, commentKey) {
+    const requestOptions = {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ comment: commentKey, post: post }),
+    };
 
-  
+    fetch("/removeComment", requestOptions)
+      .then((_data) => {
+        initializePage();
+      })
+      .catch((err) => console.error(err));
+  }
 
   return (
     <div className="center mb-3">
@@ -122,9 +122,8 @@ export default function AllPosts({ user }) {
                       className="like-button"
                     >
                       {user ? (
-                        post.likes.filter(
-                          (likerProfile) => likerProfile.username === user
-                        ).length > 0 ? (
+                        post.likes.filter((like) => like.like === user).length >
+                        0 ? (
                           <BsFillHeartFill className="liked-heart" />
                         ) : (
                           <BsHeart className="unliked-heart" />
@@ -138,20 +137,40 @@ export default function AllPosts({ user }) {
                   </div>
 
                   <Card.Text>
-                    <Link to={"/profile/" + post.username} style={{color: "black"}}><strong>{post.username}</strong></Link> 
-                      {"  " + post.description}
+                    <Link
+                      to={"/profile/" + post.username}
+                      style={{ color: "black" }}
+                    >
+                      <strong>{post.username}</strong>
+                    </Link>
+                    {"  " + post.description}
                   </Card.Text>
                   <h5>Comments</h5>
                   {post.comments
                     ? post.comments.map((item, idx) => (
-                      
-                      <div className="comment-field" key={idx}>
-                        <Link to={"/profile/" + item.split(" ")[0]} style={{ color: "black" }}>
-                        <strong>{item.split(" ")[0]}</strong>:
-                        </Link>
-                        <Card.Text style={{ color: "grey" }}>
-                          {item.split(" ").slice(1, item.split(" ").length).join(" ")}
-                        </Card.Text>
+                        <div className="comment-field" key={idx}>
+                          <Link
+                            to={"/profile/" + item.comment.split(" ")[0]}
+                            style={{ color: "black" }}
+                          >
+                            <strong>{item.comment.split(" ")[0]}</strong>:
+                          </Link>
+
+                          <Card.Text
+                            style={{ color: "grey", marginBottom: "5px" }}
+                          >
+                            {item.comment
+                              .split(" ")
+                              .slice(1, item.comment.split(" ").length)
+                              .join(" ")}
+                          </Card.Text>
+                          {user === item.comment.split(" ")[0] ? (
+                            <IconButton
+                              onClick={() => removeComment(post, item._key)}
+                            >
+                              <BsTrash size="0.5em" style={{ color: "red" }} />
+                            </IconButton>
+                          ) : null}
                         </div>
                       ))
                     : null}
@@ -159,7 +178,7 @@ export default function AllPosts({ user }) {
                     <Form>
                       <div className="comment-form">
                         <Form.Control
-                        className="comment-input"
+                          className="comment-input"
                           placeholder="Add a Comment..."
                           type="text"
                           onInput={(e) => setComment(e.target.value)}

@@ -123,7 +123,7 @@ export default function Profile({ setAlert, user }) {
             <h4>{posts ? posts.length : 0}</h4>
           </div>
           <div className="vertical-data">
-            {user && owner ? (
+            {user && (owner || following) ? (
               <Button variant="success" onClick={() => setShowFollowers(true)}>
                 Followers
               </Button>
@@ -136,7 +136,7 @@ export default function Profile({ setAlert, user }) {
             <h4>{profileData.followers ? profileData.followers.length : 0}</h4>
           </div>
           <div className="vertical-data">
-            {user && owner ? (
+            {user && (owner || following) ? (
               <Button variant="success" onClick={() => setShowFollowing(true)}>
                 Following
               </Button>

@@ -81,9 +81,6 @@ functions.getUserId = (user) => {
 functions.getAllPosts = () => {
   return sanityClient.fetch(`*[_type == "post"]{
     ...,
-    likes[]->{
-      ...
-    },
     "username": author->username,
     photo{
       asset->{
@@ -97,12 +94,10 @@ functions.getAllPosts = () => {
 functions.getPostsOfFollowing = (username) => {
   return sanityClient.fetch(
     `*[_type == "user" && username == $username]{
+
     following[]->{
       "posts": *[_type == "post" && references(^._id)]{
         ...,
-        likes[]->{
-          ...
-        },
         "username": author->username,
         photo{
           asset->{
@@ -202,27 +197,36 @@ functions.removeFollower = (user, followingId) => {
   );
 };
 
-functions.addLike = (postId, userId) => {
+functions.addLike = (postId, user) => {
   return sanityClient
     .patch(postId)
     .setIfMissing({ likes: [] })
     .insert("after", "likes[-1]", [
-      { _ref: userId, _type: "reference" },
+      {like: user, _key: nanoid()}
     ])
     .commit();
 };
 
-functions.removeLike = (postId, userId) => {
+functions.removeLike = (postId, user) => {
   return sanityClient
     .patch(postId)
-    .unset([`likes[_ref=="${userId}"]`])
+    .unset([`likes[like=="${user}"]`])
     .commit();
 };
 functions.addComment = (user, comment, postId) => {
   return sanityClient
     .patch(postId)
     .setIfMissing({ comments: [] })
-    .insert("after", "comments[-1]", [`${user} ${comment}`])
+    .insert("after", "comments[-1]", [
+      {_key: nanoid(), comment: `${user} ${comment}`}
+    ])
+    .commit();
+};
+
+functions.removeComment = (commentKey, postId) => {
+  return sanityClient
+    .patch(postId)
+    .unset([`comments[_key=="${commentKey}"]`])
     .commit();
 };
 

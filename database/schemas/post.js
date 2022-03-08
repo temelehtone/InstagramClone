@@ -28,7 +28,20 @@ export default {
       title: "Likes",
       name: "likes",
       type: "array",
-      of: [{ type: "reference", to: { type: "user" } }],
+      of: [
+        {
+          title: "Like",
+          type: "object",
+          fields: [
+            {
+              title: "Like",
+              name: "like",
+              type: "string",
+            },
+          ],
+        },
+      ],
+      validation: (Rule) => Rule.unique(),
     },
     {
       title: "Comments",
@@ -36,7 +49,15 @@ export default {
       type: "array",
       of: [
         {
-          type: 'string'
+          title: "Comment",
+          type: "object",
+          fields: [
+            {
+              title: "Comment",
+              name: "comment",
+              type: "string",
+            },
+          ],
         },
       ],
     },
