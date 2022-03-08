@@ -15,8 +15,11 @@ export default function FollowersList({ show, profileData, listHideCallback }) {
             <Card style={{ width: "100%" }}>
               <ListGroup>
                 {profileData.followers.map((item, idx) => (
-                  <ListGroupItem>
-                    <ProfileItem {...item} key={idx} listHideCallback={listHideCallback}/>
+                  <ListGroupItem key={idx}>
+                    <ProfileItem
+                      {...item}
+                      listHideCallback={listHideCallback}
+                    />
                   </ListGroupItem>
                 ))}
               </ListGroup>

@@ -36,8 +36,8 @@ export default function Search() {
             <Card style={{ width: "100%" }}>
               <ListGroup >
                 {searchResults.map((item, idx) => (
-                  <ListGroupItem>
-                    <ProfileItem {...item} key={idx} listHideCallback={() => {}} />
+                  <ListGroupItem key={idx} >
+                    <ProfileItem {...item} listHideCallback={() => {}} />
                   </ListGroupItem>
                 ))}
               </ListGroup>

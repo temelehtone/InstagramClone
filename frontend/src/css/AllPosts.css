@@ -7,5 +7,17 @@
     color: red
 }
 .unliked-heart {
-    color: rgb(112, 112, 112)
+    color: black
+}
+.comment-form {
+    display: flex;
+    gap: 2px;
+}
+.comment-field{
+    display: flex;
+    gap: 5px;
+    align-items: flex-start;
+}
+.card-body {
+    color: black;
 }

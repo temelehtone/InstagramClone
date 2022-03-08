@@ -17,6 +17,7 @@ const {
   addLike,
   removeLike,
   getUserId,
+  addComment
 } = functions;
 
 const app = express();
@@ -67,7 +68,6 @@ app.get("/getPostsOfFollowing", (req, res) => {
       posts.forEach((post) => {
         if (!newPosts.includes(post)) newPosts.push(post);
       });
-      console.log(posts)
       newPosts.sort(function (post, post2) {
         return (
           new Date(post2.created_at).getTime() -
@@ -146,5 +146,11 @@ app.delete("/removeLike", (req, res) => {
   const body = req.body;
   removeLike(body.post._id, body.user).then((data) => res.json(data));
 });
+
+app.post("/addComment", (req, res) => {
+  const body = req.body;
+  addComment(body.user, body.comment, body.post._id)
+  res.json([])
+})
 
 app.listen(3001, () => console.log("Started..."));

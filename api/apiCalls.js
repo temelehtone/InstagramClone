@@ -78,7 +78,6 @@ functions.getUserId = (user) => {
   );
 };
 
-
 functions.getAllPosts = () => {
   return sanityClient.fetch(`*[_type == "post"]{
     ...,
@@ -204,22 +203,27 @@ functions.removeFollower = (user, followingId) => {
 };
 
 functions.addLike = (postId, userId) => {
-  
   return sanityClient
-      .patch(postId)
-      .setIfMissing({ likes: [] })
-      .insert("after", "likes[-1]", [
-        { _ref: userId, _key: nanoid(), _type: "reference" },
-      ],)
-      .commit();
+    .patch(postId)
+    .setIfMissing({ likes: [] })
+    .insert("after", "likes[-1]", [
+      { _ref: userId, _type: "reference" },
+    ])
+    .commit();
 };
-
 
 functions.removeLike = (postId, userId) => {
   return sanityClient
-      .patch(postId)
-      .unset([`likes[_ref=="${userId}"]`])
-      .commit()
-}
+    .patch(postId)
+    .unset([`likes[_ref=="${userId}"]`])
+    .commit();
+};
+functions.addComment = (user, comment, postId) => {
+  return sanityClient
+    .patch(postId)
+    .setIfMissing({ comments: [] })
+    .insert("after", "comments[-1]", [`${user} ${comment}`])
+    .commit();
+};
 
 export default functions;

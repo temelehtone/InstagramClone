@@ -1,37 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Card } from "react-bootstrap";
-import { BsFillHeartFill } from "react-icons/bs";
+import { Button, Card, Form } from "react-bootstrap";
+import { BsFillHeartFill, BsHeart } from "react-icons/bs";
 import IconButton from "@mui/material/IconButton";
 import "../css/AllPosts.css";
 
 export default function AllPosts({ user }) {
   const [allPostsData, setAllPosts] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [comment, setComment] = useState("");
   var canLike = true;
 
   useEffect(() => {
     initializePage();
     if (user) getUserId(user);
-  }, [user]);
-
-function removeDuplicants(data){
-  var list = []
-  data.forEach((post) => list.push(post._id))
-  list.forEach((id => {if (count(list.filter((id => id ))) > 1) {
-    
-    list.splice(list.indexOf(id), 1)
-    data.splice(list.indexOf(id), 1)
-  }}))
-
-}
+  }, [user, allPostsData]);
 
   function initializePage() {
     if (!user) {
       fetch("/getAllPosts")
         .then((res) => res.json())
         .then((data) => {
-          
+          console.log(data);
           setAllPosts(data);
         })
         .catch((err) => console.error(err));
@@ -39,7 +29,6 @@ function removeDuplicants(data){
       fetch("getPostsOfFollowing?user=" + user)
         .then((res) => res.json())
         .then((data) => {
-          removeDuplicants(data)
           console.log(data);
           setAllPosts(data);
         })
@@ -69,7 +58,7 @@ function removeDuplicants(data){
       };
       fetch("/addLike", requestOptions)
         .then((_data) => {
-          setTimeout(() =>{}, 500)
+          setTimeout(() => {}, 500);
           canLike = true;
           initializePage();
         })
@@ -82,13 +71,29 @@ function removeDuplicants(data){
       };
       fetch("/removeLike", requestOptions)
         .then((_data) => {
-          setTimeout(() =>{}, 500)
+          setTimeout(initializePage(), 500);
           canLike = true;
-          initializePage();
+          
         })
         .catch((err) => console.error(err));
     }
   }
+
+  function addComment(post) {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: user, comment: comment, post: post }),
+    };
+
+    fetch("/addComment", requestOptions)
+      .then((_data) => {setTimeout(initializePage(), 500); setComment("")
+      document.querySelector(".comment-input").value = ""
+    })
+      .catch((err) => console.error(err));
+  }
+
+  
 
   return (
     <div className="center mb-3">
@@ -110,7 +115,7 @@ function removeDuplicants(data){
                     style={{ width: "100%" }}
                   ></Card.Img>
                 </div>
-                <Card.Body>
+                <Card.Body className="card-body">
                   <div className="likes-and-comments">
                     <IconButton
                       onClick={() => likeButtonPressed(post)}
@@ -122,19 +127,47 @@ function removeDuplicants(data){
                         ).length > 0 ? (
                           <BsFillHeartFill className="liked-heart" />
                         ) : (
-                          <BsFillHeartFill className="unliked-heart" />
+                          <BsHeart className="unliked-heart" />
                         )
                       ) : null}
                     </IconButton>
-                    <Card.Text style={{ color: "black" }}>
+                    <Card.Text>
                       <strong>{post.likes ? post.likes.length : 0}</strong>{" "}
                       likes
                     </Card.Text>
                   </div>
 
-                  <Card.Text style={{ color: "black" }}>
-                    {post.description}
+                  <Card.Text>
+                    <Link to={"/profile/" + post.username} style={{color: "black"}}><strong>{post.username}</strong></Link> 
+                      {"  " + post.description}
                   </Card.Text>
+                  <h5>Comments</h5>
+                  {post.comments
+                    ? post.comments.map((item, idx) => (
+                      
+                      <div className="comment-field" key={idx}>
+                        <Link to={"/profile/" + item.split(" ")[0]} style={{ color: "black" }}>
+                        <strong>{item.split(" ")[0]}</strong>:
+                        </Link>
+                        <Card.Text style={{ color: "grey" }}>
+                          {item.split(" ").slice(1, item.split(" ").length).join(" ")}
+                        </Card.Text>
+                        </div>
+                      ))
+                    : null}
+                  {user ? (
+                    <Form>
+                      <div className="comment-form">
+                        <Form.Control
+                        className="comment-input"
+                          placeholder="Add a Comment..."
+                          type="text"
+                          onInput={(e) => setComment(e.target.value)}
+                        />
+                        <Button onClick={() => addComment(post)}>Post</Button>
+                      </div>
+                    </Form>
+                  ) : null}
                 </Card.Body>
                 <Card.Footer className="text-muted">
                   {new Date(post.created_at).toLocaleString()}
